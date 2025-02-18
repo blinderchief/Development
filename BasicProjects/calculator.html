@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CALCULATOR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .calculator {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            width: 350px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        .display {
+            background: #202020;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 2rem;
+            color: #fff;
+            min-height: 70px;
+            word-wrap: break-word;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0px);
+        }
+        .number {
+            background: #4d4d4d;
+            color: white;
+        }
+        .operator {
+            background: #ff9500;
+            color: white;
+        }
+        .equals {
+            background: #28a745;
+            color: white;
+        }
+        .clear {
+            background: #dc3545;
+            color: white;
+        }
+        .history-section {
+            flex: 1;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .history-section h2 {
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .history-item {
+            background: #3d3d3d;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+       
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+  
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator">
+            <div class="display" id="display">0</div>
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button class="operator" onclick="appendOperator('/')">/</button>
+                <button class="operator" onclick="appendOperator('*')">×</button>
+                <button class="operator" onclick="deleteLast()">⌫</button>
+                <button class="number" onclick="appendNumber('7')">7</button>
+                <button class="number" onclick="appendNumber('8')">8</button>
+                <button class="number" onclick="appendNumber('9')">9</button>
+                <button class="operator" onclick="appendOperator('-')">-</button>
+                <button class="number" onclick="appendNumber('4')">4</button>
+                <button class="number" onclick="appendNumber('5')">5</button>
+                <button class="number" onclick="appendNumber('6')">6</button>
+                <button class="operator" onclick="appendOperator('+')">+</button>  
+                <button class="number" onclick="appendNumber('1')">1</button>
+                <button class="number" onclick="appendNumber('2')">2</button>
+                <button class="number" onclick="appendNumber('3')">3</button>
+                <button class="equals" onclick="calculate()">=</button>
+                <button class="number" onclick="appendNumber('0')">0</button>
+                <button class="number" onclick="appendNumber('00')">00</button>
+                <button class="number" onclick="appendNumber('.')">.</button>
+            </div>
+        </div>
+        <div class="history-section">
+            <h2>Recent calculated</h2>
+            <div id="history">
+                <!-- History added here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        
+        const display = document.getElementById('display');
+        const history = document.getElementById('history');
+        let currExp = '0';
+        function appendNumber(num){
+            if (currExp === '0' && num !== '.') {
+                currExp = num;
+            } else {
+                currExp += num;
+            }
+            updateDisplay();
+        }
+        function appendOperator(op) {
+            currExp += op;
+            updateDisplay();
+        }
+        function clearDisplay() {
+            currExp = '0';
+            updateDisplay();
+        }
+        function deleteLast() {
+            currExp = currExp.slice(0, -1);
+            if (currExp === '') {
+                currExp = '0';
+            }
+            updateDisplay();
+        }
+        function updateDisplay() {
+            display.textContent = currExp;
+        }
+        function calculate() {
+            try {
+                const result = eval(currExp);
+                const calculation = `${currExp} = ${result}`;
+                addToHistory(calculation);
+                currExp = result.toString();
+                updateDisplay();
+            } catch (error) {
+                currExp = 'Error';
+                updateDisplay();
+            }
+        }
+        function addToHistory(calculation) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            const calcText = document.createElement('span');
+            calcText.textContent = calculation;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.onclick = function() {
+                historyItem.remove();
+            }
+            historyItem.appendChild(calcText);
+            historyItem.appendChild(deleteBtn);
+            history.insertBefore(historyItem, history.firstChild);
+        }
+    </script>
+</body>
+</html>
